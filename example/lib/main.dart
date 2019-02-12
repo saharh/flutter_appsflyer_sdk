@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
   Future<void> initSdk() {
     appsflyerSdk.initSdk().then((onValue) {
       print(onValue.toString());
+//      appsflyerSdk.updateServerUninstallToken("test2");
     }).catchError((onError) {
       print(onError.toString());
     });
