@@ -15,4 +15,8 @@ public class AppsFlyerConstants {
     final static String AF_EVENTS_CHANNEL = "af-events";
     final static String AF_METHOD_CHANNEL = "af-api";
     final static String AF_FLUTTER_LOG_TAG = "AppsFlyerFlutter";
+
+    final static String AF_CURRENCY = "currency";
+    final static String AF_FCM_SENDER_ID = "fcmSenderId";
+    final static String AF_APP_INVITE_ONELINK = "appInviteOneLink";
 }

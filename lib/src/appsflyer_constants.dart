@@ -11,4 +11,9 @@ class AppsflyerConstants {
 
   static const String AF_EVENTS_CHANNEL = "af-events";
   static const String AF_METHOD_CHANNEL = "af-api";
+
+  static const String AF_CURRENCY = "currency";
+  static const String AF_FCM_SENDER_ID = "fcmSenderId";
+  static const String AF_APP_INVITE_ONELINK = "appInviteOneLink";
+
 }

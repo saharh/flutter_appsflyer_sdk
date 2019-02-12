@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 
 void main() {
-  final AppsFlyerOptions options = AppsFlyerOptions(afDevKey: "fdf");
+  final AppsFlyerOptions options = AppsFlyerOptions(afDevKey: "fdf", appId: "bla", appInviteOneLink: "test", currency: "USD", fcmSenderId: "tester");
   print("++++++++++++++DEV KEY++++++++++++" + options.afDevKey);
   print("++++++++++++++APP ID+++++++++++++" + options.appId);
   runApp(MyApp(appsFlyerOptions: options));

@@ -55,6 +55,10 @@ class AppsflyerSdk {
       validatedOptions[AppsflyerConstants.AF_GCD] = false;
     }
 
+    validatedOptions[AppsflyerConstants.AF_CURRENCY] = options.currency;
+    validatedOptions[AppsflyerConstants.AF_APP_INVITE_ONELINK] = options.appInviteOneLink;
+    validatedOptions[AppsflyerConstants.AF_FCM_SENDER_ID] = options.fcmSenderId;
+
     return validatedOptions;
   }
 
@@ -124,6 +128,10 @@ class AppsflyerSdk {
 
   Future<String> getAFID() async {
     return await _methodChannel.invokeMethod("getAFID");
+  }
+
+  Future<void> updateServerUninstallToken(String fcmToken) async {
+    return await _methodChannel.invokeMethod("updateServerUninstallToken", {"token" :fcmToken});
   }
 
   void _registerListener() {

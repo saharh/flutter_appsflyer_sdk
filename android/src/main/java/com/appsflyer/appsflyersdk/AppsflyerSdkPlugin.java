@@ -72,6 +72,9 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
             case "getAFID":
                 getAFID(call, result);
                 break;
+            case "updateServerUninstallToken":
+                updateServerUninstallToken(call, result);
+                break;
             default:
                 result.notImplemented();
                 break;
@@ -102,6 +105,21 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
         instance.trackEvent(mContext, null, null);
         instance.startTracking(mApplication);
 
+        // additional customizations
+        String currency = call.argument(AppsFlyerConstants.AF_CURRENCY);
+        if (currency != null) {
+            instance.setCurrencyCode(currency);
+        }
+        String senderId = call.argument(AppsFlyerConstants.AF_FCM_SENDER_ID);
+        if (senderId != null) {
+            instance.enableUninstallTracking(senderId);
+        }
+
+        String appInviteOneLink = call.argument(AppsFlyerConstants.AF_APP_INVITE_ONELINK);
+        if (appInviteOneLink != null) {
+            instance.setAppInviteOneLink(appInviteOneLink);
+        }
+
         final Map<String, String> response = new HashMap<>();
         response.put("status", "OK");
 
@@ -125,6 +143,12 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
         AppsFlyerLib instance = AppsFlyerLib.getInstance();
         String afId = instance.getAppsFlyerUID(mApplication.getApplicationContext());
         result.success(afId);
+    }
+
+    private void updateServerUninstallToken(MethodCall call, Result result) {
+        AppsFlyerLib instance = AppsFlyerLib.getInstance();
+        instance.updateServerUninstallToken(mApplication.getApplicationContext(), (String) call.argument("token"));
+        result.success(null);
     }
 
     private AppsFlyerConversionListener registerConversionListener(AppsFlyerLib instance) {
