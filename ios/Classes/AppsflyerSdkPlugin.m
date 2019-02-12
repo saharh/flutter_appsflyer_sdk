@@ -80,7 +80,7 @@
         [generator setChannel:call.arguments[@"channel"]];
         return generator;
     } completionHandler:^(NSURL * _Nullable url) {
-        result(url);
+        result([url absoluteString]);
     }];
 }
     
