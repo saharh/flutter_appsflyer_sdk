@@ -122,7 +122,7 @@ class AppsflyerSdk {
     return await _methodChannel.invokeMethod("trackEvent", {'eventName': eventName, 'eventValues': eventValues});
   }
 
-  Future<bool> getAFID() async {
+  Future<String> getAFID() async {
     return await _methodChannel.invokeMethod("getAFID");
   }
 
