@@ -17,6 +17,12 @@
         [self initSdkWithCall:call result:result];
     }else if([@"trackEvent" isEqualToString:call.method]){
         [self trackEventWithCall:call result:result];
+    }else if([@"getAFID" isEqualToString:call.method]){
+        [self getAFID:call result:result];
+    }else if([@"updateServerUninstallToken" isEqualToString:call.method]){
+        [self updateServerUninstallToken:call result:result];
+    }else if([@"generateInviteLink" isEqualToString:call.method]){
+        [self generateInviteLink:call result:result];
     }else{
         result(FlutterMethodNotImplemented);
     }
@@ -69,6 +75,15 @@
     result(nil); // NOOP, AF depends on APNS token, not FCM
 }
 
+- (void)generateInviteLink:(FlutterMethodCall*)call result:(FlutterResult)result{
+    [AppsFlyerShareInviteHelper generateInviteUrlWithLinkGenerator:^AppsFlyerLinkGenerator * _Nonnull(AppsFlyerLinkGenerator * _Nonnull generator) {
+        [generator setChannel:call.arguments[@"channel"]];
+        return generator;
+    } completionHandler:^(NSURL * _Nullable url) {
+        result(url);
+    }];
+}
+    
 -(void)trackEventWithCall:(FlutterMethodCall*)call result:(FlutterResult)result{
     NSString *eventName =  call.arguments[afEventName];
     NSDictionary *eventValues = call.arguments[afEventValues];
