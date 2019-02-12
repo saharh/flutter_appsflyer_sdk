@@ -1,6 +1,6 @@
 #import <Flutter/Flutter.h>
-#import <AppsFlyerFramework/AppsFlyerLib/AppsFlyerTracker.h>
-
+//#import <AppsFlyerFramework/AppsFlyerLib/AppsFlyerTracker.h>
+#import <AppsFlyerLib/AppsFlyerTracker.h>
 
 @interface AppsflyerSdkPlugin : NSObject<FlutterPlugin, AppsFlyerTrackerDelegate>
 
@@ -13,6 +13,10 @@
 #define afEventName                     @"eventName"
 #define afEventValues                   @"eventValues"
 #define afConversionData                @"GCD"
+
+#define afCurrency                      @"currency"
+#define afFCMSenderId                   @"fcmSenderId"
+#define afAppInviteOneLink              @"appInviteOneLink"
 
 // Appsflyer native objects
 #define afOnInstallConversionData       @"onInstallConversionData"

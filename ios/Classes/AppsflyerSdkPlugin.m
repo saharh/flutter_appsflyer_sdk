@@ -53,9 +53,20 @@
     [AppsFlyerTracker sharedTracker].isDebug = isDebug;
     [[AppsFlyerTracker sharedTracker] trackAppLaunch];
     
+    [AppsFlyerTracker sharedTracker].currencyCode = call.arguments[afCurrency];
+    [AppsFlyerTracker sharedTracker].appInviteOneLinkID = call.arguments[afAppInviteOneLink];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
     
     result(@"OK");
+}
+
+- (void)getAFID:(FlutterMethodCall*)call result:(FlutterResult)result{
+    result([AppsFlyerTracker sharedTracker].getAppsFlyerUID);
+}
+    
+- (void)updateServerUninstallToken:(FlutterMethodCall*)call result:(FlutterResult)result{
+    result(nil); // NOOP, AF depends on APNS token, not FCM
 }
 
 -(void)trackEventWithCall:(FlutterMethodCall*)call result:(FlutterResult)result{

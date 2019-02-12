@@ -1,6 +1,6 @@
 #include "AppDelegate.h"
 #include "GeneratedPluginRegistrant.h"
-#import <AppsFlyerFramework/AppsFlyerLib/AppsFlyerTracker.h>
+#import <AppsFlyerLib/AppsFlyerTracker.h>
 
 @implementation AppDelegate
 
@@ -16,6 +16,10 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
     [[AppsFlyerTracker sharedTracker] handleOpenUrl:url options:options];
     return YES;
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    [[AppsFlyerTracker sharedTracker] registerUninstall:deviceToken]; // TODO make sure this works
 }
 
 @end
