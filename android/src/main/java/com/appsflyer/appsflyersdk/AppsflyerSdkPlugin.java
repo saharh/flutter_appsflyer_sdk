@@ -63,15 +63,18 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
     public void onMethodCall(MethodCall call, Result result) {
         final String method = call.method;
         switch (method) {
-        case "initSdk":
-            initSdk(call, result);
-            break;
-        case "trackEvent":
-            trackEvent(call, result);
-            break;
-        default:
-            result.notImplemented();
-            break;
+            case "initSdk":
+                initSdk(call, result);
+                break;
+            case "trackEvent":
+                trackEvent(call, result);
+                break;
+            case "getAFID":
+                getAFID(call, result);
+                break;
+            default:
+                result.notImplemented();
+                break;
         }
     }
 
@@ -116,6 +119,12 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
         instance.trackEvent(mContext, eventName, eventValues);
 
         result.success(true);
+    }
+
+    private void getAFID(MethodCall call, Result result) {
+        AppsFlyerLib instance = AppsFlyerLib.getInstance();
+        String afId = instance.getAppsFlyerUID(mApplication.getApplicationContext());
+        result.success(afId);
     }
 
     private AppsFlyerConversionListener registerConversionListener(AppsFlyerLib instance) {

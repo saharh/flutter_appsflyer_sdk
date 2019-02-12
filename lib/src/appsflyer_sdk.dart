@@ -13,8 +13,7 @@ class AppsflyerSdk {
   ///provided by the user
   factory AppsflyerSdk(options) {
     if (_instance == null) {
-      MethodChannel methodChannel =
-          const MethodChannel(AppsflyerConstants.AF_METHOD_CHANNEL);
+      MethodChannel methodChannel = const MethodChannel(AppsflyerConstants.AF_METHOD_CHANNEL);
 
       //check if the option variable is AFOptions type or map type
       if (options is AppsFlyerOptions) {
@@ -47,8 +46,7 @@ class AppsflyerSdk {
       validatedOptions[AppsflyerConstants.AF_APP_Id] = appID;
     }
 
-    validatedOptions[AppsflyerConstants.AF_IS_DEBUG] =
-        (options.showDebug != null) ? options.showDebug : false;
+    validatedOptions[AppsflyerConstants.AF_IS_DEBUG] = (options.showDebug != null) ? options.showDebug : false;
 
     if (_afGCDStreamController != null) {
       validatedOptions[AppsflyerConstants.AF_GCD] = true;
@@ -78,10 +76,7 @@ class AppsflyerSdk {
       afOptions[AppsflyerConstants.AF_APP_Id] = appID;
     }
 
-    afOptions[AppsflyerConstants.AF_IS_DEBUG] =
-        options.containsKey(AppsflyerConstants.AF_IS_DEBUG)
-            ? options[AppsflyerConstants.AF_IS_DEBUG]
-            : false;
+    afOptions[AppsflyerConstants.AF_IS_DEBUG] = options.containsKey(AppsflyerConstants.AF_IS_DEBUG) ? options[AppsflyerConstants.AF_IS_DEBUG] : false;
 
     if (_afGCDStreamController != null) {
       afOptions[AppsflyerConstants.AF_GCD] = true;
@@ -124,13 +119,15 @@ class AppsflyerSdk {
   Future<bool> trackEvent(String eventName, Map eventValues) async {
     assert(eventValues != null);
 
-    return await _methodChannel.invokeMethod(
-        "trackEvent", {'eventName': eventName, 'eventValues': eventValues});
+    return await _methodChannel.invokeMethod("trackEvent", {'eventName': eventName, 'eventValues': eventValues});
+  }
+
+  Future<bool> getAFID() async {
+    return await _methodChannel.invokeMethod("getAFID");
   }
 
   void _registerListener() {
-    BinaryMessages.setMessageHandler(AppsflyerConstants.AF_EVENTS_CHANNEL,
-        (ByteData message) async {
+    BinaryMessages.setMessageHandler(AppsflyerConstants.AF_EVENTS_CHANNEL, (ByteData message) async {
       final buffer = message.buffer;
       final decodedStr = utf8.decode(buffer.asUint8List());
       var decodedJSON = jsonDecode(decodedStr);
