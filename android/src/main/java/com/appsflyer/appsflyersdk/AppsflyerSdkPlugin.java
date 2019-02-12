@@ -6,6 +6,9 @@ import android.content.Context;
 import com.appsflyer.AFLogger;
 import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerLib;
+import com.appsflyer.CreateOneLinkHttpTask;
+import com.appsflyer.share.LinkGenerator;
+import com.appsflyer.share.ShareInviteHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,6 +78,9 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
             case "updateServerUninstallToken":
                 updateServerUninstallToken(call, result);
                 break;
+            case "generateInviteLink":
+                generateInviteLink(call, result);
+                break;
             default:
                 result.notImplemented();
                 break;
@@ -141,14 +147,30 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
 
     private void getAFID(MethodCall call, Result result) {
         AppsFlyerLib instance = AppsFlyerLib.getInstance();
-        String afId = instance.getAppsFlyerUID(mApplication.getApplicationContext());
+        String afId = instance.getAppsFlyerUID(mContext);
         result.success(afId);
     }
 
     private void updateServerUninstallToken(MethodCall call, Result result) {
         AppsFlyerLib instance = AppsFlyerLib.getInstance();
-        instance.updateServerUninstallToken(mApplication.getApplicationContext(), (String) call.argument("token"));
+        instance.updateServerUninstallToken(mContext, (String) call.argument("token"));
         result.success(null);
+    }
+
+    private void generateInviteLink(MethodCall call, final Result result) {
+        LinkGenerator linkGenerator = ShareInviteHelper.generateInviteUrl(mContext);
+        linkGenerator.setChannel((String) call.argument("channel"));
+        linkGenerator.generateLink(mContext, new CreateOneLinkHttpTask.ResponseListener() {
+            @Override
+            public void onResponse(String url) {
+                result.success(url);
+            }
+
+            @Override
+            public void onResponseError(String url) {
+                result.success(url);
+            }
+        });
     }
 
     private AppsFlyerConversionListener registerConversionListener(AppsFlyerLib instance) {

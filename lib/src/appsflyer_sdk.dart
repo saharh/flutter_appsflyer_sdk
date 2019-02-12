@@ -131,7 +131,11 @@ class AppsflyerSdk {
   }
 
   Future<void> updateServerUninstallToken(String fcmToken) async {
-    return await _methodChannel.invokeMethod("updateServerUninstallToken", {"token" :fcmToken});
+    return await _methodChannel.invokeMethod("updateServerUninstallToken", {"token": fcmToken});
+  }
+
+  Future<String> generateInviteLink(String channel) async {
+    return await _methodChannel.invokeMethod("generateInviteLink", {"channel": channel});
   }
 
   void _registerListener() {
