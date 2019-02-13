@@ -81,6 +81,9 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
             case "generateInviteLink":
                 generateInviteLink(call, result);
                 break;
+            case "setCustomerUserId":
+                setCustomerUserId(call, result);
+                break;
             default:
                 result.notImplemented();
                 break;
@@ -154,6 +157,12 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
     private void updateServerUninstallToken(MethodCall call, Result result) {
         AppsFlyerLib instance = AppsFlyerLib.getInstance();
         instance.updateServerUninstallToken(mContext, (String) call.argument("token"));
+        result.success(null);
+    }
+
+    private void setCustomerUserId(MethodCall call, Result result) {
+        AppsFlyerLib instance = AppsFlyerLib.getInstance();
+        instance.setCustomerUserId((String) call.argument("id"));
         result.success(null);
     }
 

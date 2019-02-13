@@ -121,7 +121,7 @@ class AppsflyerSdk {
   ///to track ROI (Return on Investment) and LTV (Lifetime Value).
   ///- The `trackEvent` method allows you to send in-app events to AppsFlyer analytics. This method allows you to add events dynamically by adding them directly to the application code.
   Future<bool> trackEvent(String eventName, Map eventValues) async {
-    assert(eventValues != null);
+//    assert(eventValues != null);
 
     return await _methodChannel.invokeMethod("trackEvent", {'eventName': eventName, 'eventValues': eventValues});
   }
@@ -132,6 +132,10 @@ class AppsflyerSdk {
 
   Future<void> updateServerUninstallToken(String fcmToken) async {
     return await _methodChannel.invokeMethod("updateServerUninstallToken", {"token": fcmToken});
+  }
+
+  Future<void> setCustomerUserId(String userId) async {
+    return await _methodChannel.invokeMethod("setCustomerUserId", {"id": userId});
   }
 
   Future<String> generateInviteLink(String channel) async {
