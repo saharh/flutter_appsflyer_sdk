@@ -17,6 +17,8 @@
         [self initSdkWithCall:call result:result];
     }else if([@"trackEvent" isEqualToString:call.method]){
         [self trackEventWithCall:call result:result];
+    }else if([@"setCustomerUserId" isEqualToString:call.method]){
+        [self setCustomerUserId:call result:result];
     }else if([@"getAFID" isEqualToString:call.method]){
         [self getAFID:call result:result];
     }else if([@"updateServerUninstallToken" isEqualToString:call.method]){
@@ -70,7 +72,12 @@
 - (void)getAFID:(FlutterMethodCall*)call result:(FlutterResult)result{
     result([AppsFlyerTracker sharedTracker].getAppsFlyerUID);
 }
-    
+
+- (void)setCustomerUserId:(FlutterMethodCall*)call result:(FlutterResult)result{
+    [AppsFlyerTracker sharedTracker].customerUserID = call.arguments[@"id"];
+    result(nil);
+}
+
 - (void)updateServerUninstallToken:(FlutterMethodCall*)call result:(FlutterResult)result{
     result(nil); // NOOP, AF depends on APNS token, not FCM
 }
