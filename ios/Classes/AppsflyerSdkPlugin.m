@@ -23,8 +23,7 @@
         [self setUserEmails:call result:result];
     }else if([ @"setUserEmailsWithCryptType" isEqualToString:call.method]){
         [self setUserEmailsWithCryptType:call result:result];
-    }
-    else if([@"updateServerUninstallToken" isEqualToString:call.method]){
+    }else if([@"updateServerUninstallToken" isEqualToString:call.method]){
         [self updateServerUninstallToken:call result:result];
     }else if([@"enableUninstallTracking" isEqualToString:call.method]){
         //
@@ -52,8 +51,6 @@
         [self validateAndTrackInAppPurchase:call result:result];
     }else if([@"getAFID" isEqualToString:call.method]){
         [self getAFID:call result:result];
-    }else if([@"updateServerUninstallToken" isEqualToString:call.method]){
-        [self updateServerUninstallToken:call result:result];
     }else if([@"generateInviteLink" isEqualToString:call.method]){
         [self generateInviteLink:call result:result];
     }
@@ -196,15 +193,6 @@
 
 - (void)getAFID:(FlutterMethodCall*)call result:(FlutterResult)result{
     result([AppsFlyerTracker sharedTracker].getAppsFlyerUID);
-}
-
-- (void)setCustomerUserId:(FlutterMethodCall*)call result:(FlutterResult)result{
-    [AppsFlyerTracker sharedTracker].customerUserID = call.arguments[@"id"];
-    result(nil);
-}
-
-- (void)updateServerUninstallToken:(FlutterMethodCall*)call result:(FlutterResult)result{
-    result(nil); // NOOP, AF depends on APNS token, not FCM
 }
 
 - (void)generateInviteLink:(FlutterMethodCall*)call result:(FlutterResult)result{

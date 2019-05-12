@@ -1,10 +1,8 @@
 package com.appsflyer.appsflyersdk;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.appsflyer.AFLogger;
 import com.appsflyer.AppsFlyerConversionListener;
@@ -33,7 +31,6 @@ import io.flutter.view.FlutterView;
 
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_EVENTS_CHANNEL;
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_FAILURE;
-import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_FLUTTER_LOG_TAG;
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_ON_APP_OPEN_ATTRIBUTION;
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_ON_ATTRIBUTION_FAILURE;
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_ON_INSTALL_CONVERSION_DATA_LOADED;
@@ -375,17 +372,17 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
         result.success(afId);
     }
 
-    private void updateServerUninstallToken(MethodCall call, Result result) {
-        AppsFlyerLib instance = AppsFlyerLib.getInstance();
-        instance.updateServerUninstallToken(mContext, (String) call.argument("token"));
-        result.success(null);
-    }
+//    private void updateServerUninstallToken(MethodCall call, Result result) {
+//        AppsFlyerLib instance = AppsFlyerLib.getInstance();
+//        instance.updateServerUninstallToken(mContext, (String) call.argument("token"));
+//        result.success(null);
+//    }
 
-    private void setCustomerUserId(MethodCall call, Result result) {
-        AppsFlyerLib instance = AppsFlyerLib.getInstance();
-        instance.setCustomerUserId((String) call.argument("id"));
-        result.success(null);
-    }
+//    private void setCustomerUserId(MethodCall call, Result result) {
+//        AppsFlyerLib instance = AppsFlyerLib.getInstance();
+//        instance.setCustomerUserId((String) call.argument("id"));
+//        result.success(null);
+//    }
 
     private void generateInviteLink(MethodCall call, final Result result) {
         LinkGenerator linkGenerator = ShareInviteHelper.generateInviteUrl(mContext);

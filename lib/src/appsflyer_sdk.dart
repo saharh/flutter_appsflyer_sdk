@@ -151,10 +151,6 @@ class AppsflyerSdk {
     return await _methodChannel.invokeMethod("getAFID");
   }
 
-  Future<void> updateServerUninstallToken(String fcmToken) async {
-    return await _methodChannel.invokeMethod("updateServerUninstallToken", {"token": fcmToken});
-  }
-
   void setHost(String hostPrefix, String hostName) {
     _methodChannel.invokeMethod(
         "setHost", {'hostPrefix': hostPrefix, 'hostName': hostName});
@@ -196,6 +192,8 @@ class AppsflyerSdk {
         .invokeMethod("setCurrencyCode", {'currencyCode': currencyCode});
   }
 
+  void setCustomerUserId(String id) {
+    _methodChannel.invokeMethod("setCustomerUserId", {'id': id});
   }
 
   void setIsUpdate(bool isUpdate) {
