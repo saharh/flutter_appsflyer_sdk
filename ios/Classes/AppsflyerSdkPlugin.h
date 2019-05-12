@@ -1,6 +1,6 @@
 #import <Flutter/Flutter.h>
-//#import <AppsFlyerFramework/AppsFlyerLib/AppsFlyerTracker.h>
 #import <AppsFlyerLib/AppsFlyerTracker.h>
+
 
 @interface AppsflyerSdkPlugin : NSObject<FlutterPlugin, AppsFlyerTrackerDelegate>
 
@@ -30,3 +30,4 @@
 // Stream Channels
 #define afMethodChannel                 @"af-api"
 #define afEventChannel                  @"af-events"
+#define afValidatePurchaseChannel       @"af-validate-purchase"
