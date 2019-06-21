@@ -49,14 +49,18 @@
         [self setAdditionalData:call result:result];
     }else if([@"validateAndTrackInAppPurchase" isEqualToString:call.method]){
         [self validateAndTrackInAppPurchase:call result:result];
-    }else if([@"getAFID" isEqualToString:call.method]){
-        [self getAFID:call result:result];
+    }else if([@"getAppsFlyerUID" isEqualToString:call.method]){
+        [self getAppsFlyerUID:result];
     }else if([@"generateInviteLink" isEqualToString:call.method]){
         [self generateInviteLink:call result:result];
     }
     else{
         result(FlutterMethodNotImplemented);
     }
+}
+
+- (void)getAppsFlyerUID:(FlutterResult)result{
+    result([[AppsFlyerTracker sharedTracker] getAppsFlyerUID]);
 }
 
 - (void)getHostPrefix:(FlutterResult)result{
@@ -191,9 +195,7 @@
     result(@"OK");
 }
 
-- (void)getAFID:(FlutterMethodCall*)call result:(FlutterResult)result{
-    result([AppsFlyerTracker sharedTracker].getAppsFlyerUID);
-}
+
 
 - (void)generateInviteLink:(FlutterMethodCall*)call result:(FlutterResult)result{
     [AppsFlyerShareInviteHelper generateInviteUrlWithLinkGenerator:^AppsFlyerLinkGenerator * _Nonnull(AppsFlyerLinkGenerator * _Nonnull generator) {
