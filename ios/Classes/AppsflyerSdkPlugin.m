@@ -8,6 +8,7 @@
                                      methodChannelWithName:afMethodChannel
                                      binaryMessenger:[registrar messenger]];
     AppsflyerSdkPlugin* instance = [[AppsflyerSdkPlugin alloc] init];
+    [registrar addApplicationDelegate:instance];
     [registrar addMethodCallDelegate:instance channel:channel];
 }
 
@@ -291,6 +292,9 @@
 }
 
 
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    [[AppsFlyerTracker sharedTracker] registerUninstall:deviceToken];
+}
 
 
 @end
