@@ -147,10 +147,6 @@ class AppsflyerSdk {
     return await _methodChannel.invokeMethod("trackEvent", {'eventName': eventName, 'eventValues': eventValues});
   }
 
-  Future<String> getAFID() async {
-    return await _methodChannel.invokeMethod("getAFID");
-  }
-
   void setHost(String hostPrefix, String hostName) {
     _methodChannel.invokeMethod(
         "setHost", {'hostPrefix': hostPrefix, 'hostName': hostName});
