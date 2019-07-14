@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.appsflyer.AFLogger;
 import com.appsflyer.AppsFlyerConversionListener;
@@ -33,7 +32,6 @@ import io.flutter.view.FlutterView;
 
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_EVENTS_CHANNEL;
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_FAILURE;
-import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_FLUTTER_LOG_TAG;
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_ON_APP_OPEN_ATTRIBUTION;
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_ON_ATTRIBUTION_FAILURE;
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_ON_INSTALL_CONVERSION_DATA_LOADED;
@@ -52,11 +50,13 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
     private Context mContext;
     private Application mApplication;
     private Intent mIntent;
+    private final Activity mActivity;
 
     private static AppsflyerSdkPlugin instance = null;
 
     AppsflyerSdkPlugin(Registrar registrar) {
         this.mFlutterVliew = registrar.view();
+        this.mActivity = registrar.activity();
         this.mContext = registrar.activity().getApplicationContext();
         this.mApplication = registrar.activity().getApplication();
         this.mIntent = registrar.activity().getIntent();
@@ -77,80 +77,80 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
     public void onMethodCall(MethodCall call, Result result) {
         final String method = call.method;
         switch (method) {
-        case "initSdk":
-            initSdk(call, result);
-            break;
-        case "trackEvent":
-            trackEvent(call, result);
-            break;
-        case "setHost":
-            setHost(call, result);
-            break;
-        case "setCurrencyCode":
-            setCurrencyCode(call, result);
-            break;
-        case "setIsUpdate":
-            setIsUpdate(call, result);
-            break;
-        case "stopTracking":
-            stopTracking(call, result);
-            break;
-        case "enableUninstallTracking":
-            enableUninstallTracking(call, result);
-            break;
-        case "updateServerUninstallToken":
-            updateServerUninstallToken(call, result);
-            break;
-        case "setImeiData":
-            setImeiData(call, result);
-            break;
-        case "setAndroidIdData":
-            setAndroidIdData(call, result);
-            break;
-        case "enableLocationCollection":
-            enableLocationCollection(call, result);
-            break;
-        case "setCustomerUserId":
-            setCustomerUserId(call, result);
-            break;
-        case "waitForCustomerUserId":
-            waitForCustomerUserId(call, result);
-            break;
-        case "setAdditionalData":
-            setAdditionalData(call, result);
-            break;
-        case "setUserEmails":
-            setUserEmails(call, result);
-            break;
-        case "setUserEmailsWithCryptType":
-            setUserEmailsWithCryptType(call, result);
-        case "setCollectAndroidId":
-            setCollectAndroidId(call, result);
-            break;
-        case "setCollectIMEI":
-            setCollectIMEI(call, result);
-            break;
-        case "getHostName":
-            getHostName(result);
-            break;
-        case "getHostPrefix":
-            getHostPrefix(result);
-            break;
-        case "setMinTimeBetweenSessions":
-            setMinTimeBetweenSessions(call, result);
-            break;
-        case "validateAndTrackInAppPurchase":
-            validateAndTrackInAppPurchase(call, result);
-            break;
-        case "getAppsFlyerUID":
-            getAppsFlyerUID(result);
-            break;
-        case "generateInviteLink":
-            generateInviteLink(call, result);
-            break;
-        default:
-            result.notImplemented();
-            break;
+            case "initSdk":
+                initSdk(call, result);
+                break;
+            case "trackEvent":
+                trackEvent(call, result);
+                break;
+            case "setHost":
+                setHost(call, result);
+                break;
+            case "setCurrencyCode":
+                setCurrencyCode(call, result);
+                break;
+            case "setIsUpdate":
+                setIsUpdate(call, result);
+                break;
+            case "stopTracking":
+                stopTracking(call, result);
+                break;
+            case "enableUninstallTracking":
+                enableUninstallTracking(call, result);
+                break;
+            case "updateServerUninstallToken":
+                updateServerUninstallToken(call, result);
+                break;
+            case "setImeiData":
+                setImeiData(call, result);
+                break;
+            case "setAndroidIdData":
+                setAndroidIdData(call, result);
+                break;
+            case "enableLocationCollection":
+                enableLocationCollection(call, result);
+                break;
+            case "setCustomerUserId":
+                setCustomerUserId(call, result);
+                break;
+            case "waitForCustomerUserId":
+                waitForCustomerUserId(call, result);
+                break;
+            case "setAdditionalData":
+                setAdditionalData(call, result);
+                break;
+            case "setUserEmails":
+                setUserEmails(call, result);
+                break;
+            case "setUserEmailsWithCryptType":
+                setUserEmailsWithCryptType(call, result);
+            case "setCollectAndroidId":
+                setCollectAndroidId(call, result);
+                break;
+            case "setCollectIMEI":
+                setCollectIMEI(call, result);
+                break;
+            case "getHostName":
+                getHostName(result);
+                break;
+            case "getHostPrefix":
+                getHostPrefix(result);
+                break;
+            case "setMinTimeBetweenSessions":
+                setMinTimeBetweenSessions(call, result);
+                break;
+            case "validateAndTrackInAppPurchase":
+                validateAndTrackInAppPurchase(call, result);
+                break;
+            case "getAppsFlyerUID":
+                getAppsFlyerUID(result);
+                break;
+            case "generateInviteLink":
+                generateInviteLink(call, result);
+                break;
+            default:
+                result.notImplemented();
+                break;
         }
     }
 
@@ -385,13 +385,23 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
         linkGenerator.setChannel((String) call.argument("channel"));
         linkGenerator.generateLink(mContext, new CreateOneLinkHttpTask.ResponseListener() {
             @Override
-            public void onResponse(String url) {
-                result.success(url);
+            public void onResponse(final String url) {
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        result.success(url);
+                    }
+                });
             }
 
             @Override
-            public void onResponseError(String url) {
-                result.success(url);
+            public void onResponseError(final String url) {
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        result.success(url);
+                    }
+                });
             }
         });
     }
