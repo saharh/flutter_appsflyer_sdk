@@ -52,7 +52,7 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
     private Intent mIntent;
     private final Activity mActivity;
 
-    private static AppsflyerSdkPlugin instance = null;
+    // private static AppsflyerSdkPlugin instance = null;
 
     AppsflyerSdkPlugin(Registrar registrar) {
         this.mFlutterVliew = registrar.view();
@@ -63,10 +63,10 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
     }
 
     public static void registerWith(Registrar registrar) {
-
-        if (instance == null) {
+        AppsflyerSdkPlugin instance = new AppsflyerSdkPlugin(registrar);
+        /*if (instance == null) {
             instance = new AppsflyerSdkPlugin(registrar);
-        }
+        }*/
 
         final MethodChannel channel = new MethodChannel(registrar.messenger(), AppsFlyerConstants.AF_METHOD_CHANNEL);
 
@@ -409,23 +409,44 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
     private AppsFlyerConversionListener registerConversionListener(AppsFlyerLib instance) {
         return new AppsFlyerConversionListener() {
             @Override
-            public void onInstallConversionDataLoaded(Map<String, String> map) {
-                handleSuccess(AF_ON_INSTALL_CONVERSION_DATA_LOADED, map, AF_EVENTS_CHANNEL);
+            public void onInstallConversionDataLoaded(final Map<String, String> map) {
+
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleSuccess(AF_ON_INSTALL_CONVERSION_DATA_LOADED, map, AF_EVENTS_CHANNEL);
+                    }
+                });
             }
 
             @Override
-            public void onInstallConversionFailure(String errorMessage) {
-                handleError(AF_ON_INSTALL_CONVERSION_FAILURE, errorMessage, AF_EVENTS_CHANNEL);
+            public void onInstallConversionFailure(final String errorMessage) {
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleError(AF_ON_INSTALL_CONVERSION_FAILURE, errorMessage, AF_EVENTS_CHANNEL);
+                    }
+                });
             }
 
             @Override
-            public void onAppOpenAttribution(Map<String, String> map) {
-                handleSuccess(AF_ON_APP_OPEN_ATTRIBUTION, map, AF_EVENTS_CHANNEL);
+            public void onAppOpenAttribution(final Map<String, String> map) {
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleSuccess(AF_ON_APP_OPEN_ATTRIBUTION, map, AF_EVENTS_CHANNEL);
+                    }
+                });
             }
 
             @Override
-            public void onAttributionFailure(String errorMessage) {
-                handleError(AF_ON_ATTRIBUTION_FAILURE, errorMessage, AF_EVENTS_CHANNEL);
+            public void onAttributionFailure(final String errorMessage) {
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleError(AF_ON_ATTRIBUTION_FAILURE, errorMessage, AF_EVENTS_CHANNEL);
+                    }
+                });
             }
         };
     }
