@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.1'
+        classpath 'com.android.tools.build:gradle:3.3.0'
     }
 }
 rootProject.allprojects {
@@ -23,7 +23,8 @@ android {
     compileSdkVersion 28
     defaultConfig {
         minSdkVersion 16
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        targetSdkVersion 28
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
         disable 'InvalidPackage'
@@ -32,6 +33,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.appsflyer:af-android-sdk:4.9.0'
+    implementation 'com.appsflyer:af-android-sdk:4.10.1'
     implementation 'com.android.installreferrer:installreferrer:1.0'
 }

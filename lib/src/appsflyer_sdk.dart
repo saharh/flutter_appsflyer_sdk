@@ -14,7 +14,8 @@ class AppsflyerSdk {
   ///provided by the user
   factory AppsflyerSdk(options) {
     if (_instance == null) {
-      MethodChannel methodChannel = const MethodChannel(AppsflyerConstants.AF_METHOD_CHANNEL);
+      MethodChannel methodChannel =
+          const MethodChannel(AppsflyerConstants.AF_METHOD_CHANNEL);
 
       //check if the option variable is AFOptions type or map type
       if (options is AppsFlyerOptions) {
@@ -47,7 +48,8 @@ class AppsflyerSdk {
       validatedOptions[AppsflyerConstants.AF_APP_Id] = appID;
     }
 
-    validatedOptions[AppsflyerConstants.AF_IS_DEBUG] = (options.showDebug != null) ? options.showDebug : false;
+    validatedOptions[AppsflyerConstants.AF_IS_DEBUG] =
+        (options.showDebug != null) ? options.showDebug : false;
 
     if (_afGCDStreamController != null) {
       validatedOptions[AppsflyerConstants.AF_GCD] = true;
@@ -57,7 +59,8 @@ class AppsflyerSdk {
     }
 
     validatedOptions[AppsflyerConstants.AF_CURRENCY] = options.currency;
-    validatedOptions[AppsflyerConstants.AF_APP_INVITE_ONELINK] = options.appInviteOneLink;
+    validatedOptions[AppsflyerConstants.AF_APP_INVITE_ONELINK] =
+        options.appInviteOneLink;
     validatedOptions[AppsflyerConstants.AF_FCM_SENDER_ID] = options.fcmSenderId;
 
     return validatedOptions;
@@ -81,7 +84,10 @@ class AppsflyerSdk {
       afOptions[AppsflyerConstants.AF_APP_Id] = appID;
     }
 
-    afOptions[AppsflyerConstants.AF_IS_DEBUG] = options.containsKey(AppsflyerConstants.AF_IS_DEBUG) ? options[AppsflyerConstants.AF_IS_DEBUG] : false;
+    afOptions[AppsflyerConstants.AF_IS_DEBUG] =
+        options.containsKey(AppsflyerConstants.AF_IS_DEBUG)
+            ? options[AppsflyerConstants.AF_IS_DEBUG]
+            : false;
 
     if (_afGCDStreamController != null) {
       afOptions[AppsflyerConstants.AF_GCD] = true;
@@ -144,7 +150,8 @@ class AppsflyerSdk {
   Future<bool> trackEvent(String eventName, Map eventValues) async {
 //    assert(eventValues != null);
 
-    return await _methodChannel.invokeMethod("trackEvent", {'eventName': eventName, 'eventValues': eventValues});
+    return await _methodChannel.invokeMethod(
+        "trackEvent", {'eventName': eventName, 'eventValues': eventValues});
   }
 
   void setHost(String hostPrefix, String hostName) {
@@ -213,9 +220,10 @@ class AppsflyerSdk {
   void updateServerUninstallToken(String token) {
     _methodChannel.invokeMethod("updateServerUninstallToken", {'token': token});
   }
-  
+
   Future<String> generateInviteLink(String channel) async {
-    return await _methodChannel.invokeMethod("generateInviteLink", {"channel": channel});
+    return await _methodChannel
+        .invokeMethod("generateInviteLink", {"channel": channel});
   }
 
   void setUserEmails(List<String> emails, [EmailCryptType cryptType]) {
@@ -261,7 +269,8 @@ class AppsflyerSdk {
   }
 
   void _registerGCDListener() {
-    BinaryMessages.setMessageHandler(AppsflyerConstants.AF_EVENTS_CHANNEL, (ByteData message) async {
+    defaultBinaryMessenger.setMessageHandler(
+        AppsflyerConstants.AF_EVENTS_CHANNEL, (ByteData message) async {
       final buffer = message.buffer;
       final decodedStr = utf8.decode(buffer.asUint8List());
       var decodedJSON = jsonDecode(decodedStr);
@@ -282,9 +291,9 @@ class AppsflyerSdk {
   }
 
   void _registerPurchaseValidateListener() {
-    BinaryMessages.setMessageHandler(
-        AppsflyerConstants.AF_VALIDATE_PURCHASE_CHANNEL,
-        (ByteData message) async {
+    defaultBinaryMessenger
+        .setMessageHandler(AppsflyerConstants.AF_VALIDATE_PURCHASE_CHANNEL,
+            (ByteData message) async {
       final buffer = message.buffer;
       final decodedStr = utf8.decode(buffer.asUint8List());
       var decodedJSON = jsonDecode(decodedStr);
@@ -294,6 +303,7 @@ class AppsflyerSdk {
       } else {
         _afValidtaPurchaseController.sink.addError(decodedJSON);
       }
+      return null;
     });
   }
 }
