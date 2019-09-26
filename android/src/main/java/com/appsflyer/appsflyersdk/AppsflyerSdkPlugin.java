@@ -27,7 +27,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.view.FlutterView;
 
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_EVENTS_CHANNEL;
 import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_FAILURE;
@@ -44,7 +43,6 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
     /**
      * Plugin registration.
      */
-    private FlutterView mFlutterView;
     private Context mContext;
     private Application mApplication;
     private Intent mIntent;
@@ -53,7 +51,6 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
     private final Activity mActivity;
 
     AppsflyerSdkPlugin(Registrar registrar) {
-        this.mFlutterView = registrar.view();
         this.mActivity = registrar.activity();
         this.mContext = registrar.activity().getApplicationContext();
         this.mApplication = registrar.activity().getApplication();
