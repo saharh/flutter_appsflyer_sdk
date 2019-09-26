@@ -2,7 +2,6 @@ package com.appsflyer.appsflyersdk;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
@@ -49,7 +48,6 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
     private Context mContext;
     private Application mApplication;
     private Intent mIntent;
-    private BroadcastReceiver mBroadcastReceiver;
 
     private static AppsflyerSdkPlugin instance = null;
     private final Activity mActivity;
