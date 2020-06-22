@@ -5,12 +5,17 @@ import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.appsflyer.AFLogger;
 import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerInAppPurchaseValidatorListener;
 import com.appsflyer.AppsFlyerLib;
 import com.appsflyer.AppsFlyerProperties;
+import com.appsflyer.CreateOneLinkHttpTask;
+import com.appsflyer.share.LinkGenerator;
+import com.appsflyer.share.ShareInviteHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -128,6 +133,9 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
             case "getAppsFlyerUID":
                 getAppsFlyerUID(result);
                 break;
+            case "generateInviteLink":
+                generateInviteLink(call, result);
+                break;
             case "getSDKVersion":
                 getSdkVersion(result);
                 break;
@@ -135,6 +143,32 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
                 result.notImplemented();
                 break;
         }
+    }
+
+    private void generateInviteLink(MethodCall call, final Result result) {
+        LinkGenerator linkGenerator = ShareInviteHelper.generateInviteUrl(mContext);
+        linkGenerator.setChannel((String) call.argument("channel"));
+        linkGenerator.generateLink(mContext, new CreateOneLinkHttpTask.ResponseListener() {
+            @Override
+            public void onResponse(final String url) {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        result.success(url);
+                    }
+                });
+            }
+
+            @Override
+            public void onResponseError(final String url) {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        result.success(url);
+                    }
+                });
+            }
+        });
     }
 
     private void getAppsFlyerUID(Result result) {
@@ -451,7 +485,6 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-
     }
 
     @Override
@@ -461,6 +494,5 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
 
     @Override
     public void onDetachedFromActivity() {
-
     }
 }

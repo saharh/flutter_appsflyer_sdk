@@ -71,10 +71,21 @@
         [self validateAndTrackInAppPurchase:call result:result];
     }else if([@"getAppsFlyerUID" isEqualToString:call.method]){
         [self getAppsFlyerUID:result];
+    }else if([@"generateInviteLink" isEqualToString:call.method]){
+        [self generateInviteLink:call result:result];
     }
     else{
         result(FlutterMethodNotImplemented);
     }
+}
+
+- (void)generateInviteLink:(FlutterMethodCall*)call result:(FlutterResult)result{
+    [AppsFlyerShareInviteHelper generateInviteUrlWithLinkGenerator:^AppsFlyerLinkGenerator * _Nonnull(AppsFlyerLinkGenerator * _Nonnull generator) {
+        [generator setChannel:call.arguments[@"channel"]];
+        return generator;
+    } completionHandler:^(NSURL * _Nullable url) {
+        result([url absoluteString]);
+    }];
 }
 
 - (void)getAppsFlyerUID:(FlutterResult)result{
