@@ -56,7 +56,7 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
         this.mApplication = registrar.activity().getApplication();
         this.mIntent = registrar.activity().getIntent();
         this.mEventChannel = new EventChannel(registrar.messenger(), AF_EVENTS_CHANNEL);
-                mEventChannel.setStreamHandler(new AppsFlyerStreamHandler(mContext));
+        mEventChannel.setStreamHandler(new AppsFlyerStreamHandler(mContext));
     }
 
     public static void registerWith(Registrar registrar) {
@@ -286,8 +286,8 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
     }
 
     private void enableUninstallTracking(MethodCall call, Result result) {
-        String senderId = (String) call.argument("senderId");
-        AppsFlyerLib.getInstance().enableUninstallTracking(senderId);
+//        String senderId = (String) call.argument("senderId");
+//        AppsFlyerLib.getInstance().enableUninstallTracking(senderId); // deprecated
         result.success(null);
     }
 
@@ -350,10 +350,10 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
         if (currency != null) {
             instance.setCurrencyCode(currency);
         }
-        String senderId = call.argument(AppsFlyerConstants.AF_FCM_SENDER_ID);
-        if (senderId != null) {
-            instance.enableUninstallTracking(senderId);
-        }
+//        String senderId = call.argument(AppsFlyerConstants.AF_FCM_SENDER_ID);
+//        if (senderId != null) {
+//            instance.enableUninstallTracking(senderId); // deprecated
+//        }
 
         String appInviteOneLink = call.argument(AppsFlyerConstants.AF_APP_INVITE_ONELINK);
         if (appInviteOneLink != null) {
@@ -407,14 +407,25 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
 
     private AppsFlyerConversionListener registerConversionListener(AppsFlyerLib instance) {
         return new AppsFlyerConversionListener() {
+//            @Override
+//            public void onInstallConversionDataLoaded(Map<String, String> map) {
+//                handleSuccess(AF_ON_INSTALL_CONVERSION_DATA_LOADED, map, AF_EVENTS_CHANNEL);
+//            }
+//
+//            @Override
+//            public void onInstallConversionFailure(String errorMessage) {
+//                handleError(AF_ON_INSTALL_CONVERSION_DATA_LOADED, errorMessage, AF_EVENTS_CHANNEL);
+//            }
+
             @Override
-            public void onInstallConversionDataLoaded(Map<String, String> map) {
+            public void onConversionDataSuccess(Map<String, Object> map) {
                 handleSuccess(AF_ON_INSTALL_CONVERSION_DATA_LOADED, map, AF_EVENTS_CHANNEL);
             }
 
             @Override
-            public void onInstallConversionFailure(String errorMessage) {
+            public void onConversionDataFail(String s) {
                 handleError(AF_ON_INSTALL_CONVERSION_DATA_LOADED, errorMessage, AF_EVENTS_CHANNEL);
+
             }
 
             @Override
@@ -467,7 +478,7 @@ public class AppsflyerSdkPlugin implements MethodCallHandler {
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         intent.setAction(AppsFlyerConstants.AF_BROADCAST_ACTION_NAME);
-        intent.putExtra("params",params.toString());
+        intent.putExtra("params", params.toString());
         mContext.sendBroadcast(intent);
     }
 }
