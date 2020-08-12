@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.appsflyer.AFLogger;
 import com.appsflyer.AppsFlyerConversionListener;
@@ -460,7 +461,13 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         intent.setAction(AppsFlyerConstants.AF_BROADCAST_ACTION_NAME);
         intent.putExtra("params",params.toString());
-        mContext.sendBroadcast(intent);
+        if (mContext != null) {
+            mContext.sendBroadcast(intent);
+        } else {
+            Log.w("AppsflyerSdk", "No context to send event to dart with");
+        }
+//        } else if (mApplication != null) {
+//            mApplication.sendBroadcast(intent);
     }
 
     @Override
