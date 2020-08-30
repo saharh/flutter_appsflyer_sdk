@@ -73,6 +73,10 @@
         [self getAppsFlyerUID:result];
     }else if([@"generateInviteLink" isEqualToString:call.method]){
         [self generateInviteLink:call result:result];
+    }else if([@"setSharingFilter" isEqualToString:call.method]){
+        [self setSharingFilter:call result:result];
+    }else if([@"setSharingFilterForAllPartners" isEqualToString:call.method]){
+        [self setSharingFilterForAllPartners:result];
     }
     else{
         result(FlutterMethodNotImplemented);
@@ -86,6 +90,17 @@
     } completionHandler:^(NSURL * _Nullable url) {
         result([url absoluteString]);
     }];
+}
+
+- (void)setSharingFilter:(FlutterMethodCall*)call result:(FlutterResult)result{
+    NSArray* filters = call.arguments;
+    [[AppsFlyerTracker sharedTracker] setSharingFilter:filters];
+    result(nil);
+}
+
+- (void)setSharingFilterForAllPartners:(FlutterResult)result{
+    [[AppsFlyerTracker sharedTracker] setSharingFilterForAllPartners];
+    result(nil);
 }
 
 - (void)getAppsFlyerUID:(FlutterResult)result{
@@ -271,4 +286,3 @@
 
 
 @end
-

@@ -111,8 +111,12 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
             case "setAdditionalData":
                 setAdditionalData(call, result);
                 break;
+            case "setUserEmails":
+                setUserEmails(call, result);
+                break;
             case "setUserEmailsWithCryptType":
                 setUserEmailsWithCryptType(call, result);
+                break;
             case "setCollectAndroidId":
                 setCollectAndroidId(call, result);
                 break;
@@ -140,12 +144,18 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
             case "getSDKVersion":
                 getSdkVersion(result);
                 break;
+            case "setSharingFilter":
+                setSharingFilter(call, result);
+                break;
+            case "setSharingFilterForAllPartners":
+                setSharingFilterForAllPartners(result);
+                break;
             default:
                 result.notImplemented();
                 break;
         }
     }
-
+	
     private void generateInviteLink(MethodCall call, final Result result) {
         LinkGenerator linkGenerator = ShareInviteHelper.generateInviteUrl(mContext);
         linkGenerator.setChannel((String) call.argument("channel"));
@@ -170,6 +180,16 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
                 });
             }
         });
+    }
+
+    private void setSharingFilterForAllPartners(Result result) {
+        AppsFlyerLib.getInstance().setSharingFilterForAllPartners();
+        result.success(null);
+    }
+
+    private void setSharingFilter(MethodCall call, Result result) {
+        AppsFlyerLib.getInstance().setSharingFilter();
+        result.success(null);
     }
 
     private void getAppsFlyerUID(Result result) {
@@ -310,12 +330,6 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         result.success(null);
     }
 
-    // private void enableUninstallTracking(MethodCall call, Result result) {
-    //     String senderId = (String) call.argument("senderId");
-    //     AppsFlyerLib.getInstance().enableUninstallTracking(senderId);
-    //     result.success(null);
-    // }
-
     private void stopTracking(MethodCall call, Result result) {
         boolean isTrackingStopped = (boolean) call.argument("isTrackingStopped");
         AppsFlyerLib.getInstance().stopTracking(isTrackingStopped, mContext);
@@ -341,7 +355,7 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         AppsFlyerLib.getInstance().setHost(hostPrefix, hostName);
     }
 
-    private void initSdk(MethodCall call, MethodChannel.Result result) {
+    private void initSdk(MethodCall call, final MethodChannel.Result result) {
         AppsFlyerConversionListener gcdListener = null;
         AppsFlyerLib instance = AppsFlyerLib.getInstance();
 
@@ -350,6 +364,9 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         }
 
         String afDevKey = (String) call.argument(AppsFlyerConstants.AF_DEV_KEY);
+        if(afDevKey == null || afDevKey.equals("")){
+            result.error(null,"AF Dev Key is empty","AF dev key cannot be empty");
+        }
 
         boolean getGCD = (boolean) call.argument(AppsFlyerConstants.AF_GCD);
 
@@ -367,12 +384,9 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
 
         instance.init(afDevKey, gcdListener, mContext);
         instance.trackEvent(mContext, null, null);
-        instance.startTracking(mApplication);
+        instance.startTracking(mApplication, afDevKey);
 
-        final Map<String, String> response = new HashMap<>();
-        response.put("status", "OK");
-
-        result.success(response);
+        result.success("success");
     }
 
     private void trackEvent(MethodCall call, MethodChannel.Result result) {
