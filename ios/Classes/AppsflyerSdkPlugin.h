@@ -12,6 +12,7 @@
 #define afEventName                     @"eventName"
 #define afEventValues                   @"eventValues"
 #define afConversionData                @"GCD"
+#define afOneLinkId                     @"oneLinkId"
 
 // Appsflyer native objects
 #define afOnInstallConversionData       @"onInstallConversionData"

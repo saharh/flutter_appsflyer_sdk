@@ -18,4 +18,6 @@ public class AppsFlyerConstants {
     final static String AF_METHOD_CHANNEL                       = "af-api";
 
     final static String AF_BROADCAST_ACTION_NAME                = "com.appsflyer.appsflyersdk";
+
+    final static String AF_ADDITIONAL_ONELINK_ID                = "oneLinkId";
 }

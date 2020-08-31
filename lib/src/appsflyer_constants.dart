@@ -21,4 +21,6 @@ class AppsflyerConstants {
   static const String AF_METHOD_CHANNEL = "af-api";
 
   static const AF_VALIDATE_PURCHASE = "validatePurchase";
+
+  static const String AF_ADDITIONAL_ONELINK_ID = "oneLinkId";
 }

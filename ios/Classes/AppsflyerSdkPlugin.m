@@ -234,6 +234,8 @@
     [AppsFlyerTracker sharedTracker].appleAppID = appId;
     [AppsFlyerTracker sharedTracker].appsFlyerDevKey = devKey;
     [AppsFlyerTracker sharedTracker].isDebug = isDebug;
+    NSString *appInviteOneLinkID = call.arguments[afOneLinkId];
+    [AppsFlyerTracker sharedTracker].appInviteOneLinkID = appInviteOneLinkID;
     [[AppsFlyerTracker sharedTracker] trackAppLaunch];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];

@@ -64,6 +64,7 @@ class AppsflyerSdk {
     } else {
       validatedOptions[AppsflyerConstants.AF_GCD] = false;
     }
+    validatedOptions[AppsflyerConstants.AF_ADDITIONAL_ONELINK_ID] = options.appInviteOneLink;
 
     return validatedOptions;
   }

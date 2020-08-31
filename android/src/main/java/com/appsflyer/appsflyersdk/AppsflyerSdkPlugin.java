@@ -155,7 +155,7 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
                 break;
         }
     }
-	
+    
     private void generateInviteLink(MethodCall call, final Result result) {
         LinkGenerator linkGenerator = ShareInviteHelper.generateInviteUrl(mContext);
         linkGenerator.setChannel((String) call.argument("channel"));
@@ -380,6 +380,10 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
             instance.setDebugLog(true);
         } else {
             instance.setDebugLog(false);
+        }
+        String oneLinkId = (String) call.argument(AppsFlyerConstants.AF_ADDITIONAL_ONELINK_ID);
+        if (oneLinkId != null) {
+            instance.setAppInviteOneLink(oneLinkId);
         }
 
         instance.init(afDevKey, gcdListener, mContext);
