@@ -14,13 +14,17 @@ import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerInAppPurchaseValidatorListener;
 import com.appsflyer.AppsFlyerLib;
 import com.appsflyer.AppsFlyerProperties;
+import com.appsflyer.AppsFlyerTrackingRequestListener;
 import com.appsflyer.CreateOneLinkHttpTask;
+import com.appsflyer.share.CrossPromotionHelper;
 import com.appsflyer.share.LinkGenerator;
 import com.appsflyer.share.ShareInviteHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -50,7 +54,7 @@ import static com.appsflyer.appsflyersdk.AppsFlyerConstants.AF_VALIDATE_PURCHASE
  * AppsflyerSdkPlugin
  */
 public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, ActivityAware {
-    private  EventChannel mEventChannel;
+    private EventChannel mEventChannel;
     /**
      * Plugin registration.
      */
@@ -59,6 +63,8 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
     private Application mApplication;
     private Intent mIntent;
     private MethodChannel mMethodChannel;
+    private MethodChannel mCallbackChannel;
+    final Handler uiThreadHandler = new Handler(Looper.getMainLooper());
 
     private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger) {
         this.mContext = applicationContext;
@@ -66,6 +72,33 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         mEventChannel.setStreamHandler(new AppsFlyerStreamHandler(mContext));
         mMethodChannel = new MethodChannel(messenger, AppsFlyerConstants.AF_METHOD_CHANNEL);
         mMethodChannel.setMethodCallHandler(this);
+        mCallbackChannel = new MethodChannel(messenger, AppsFlyerConstants.AF_CALLBACK_CHANNEL);
+        mCallbackChannel.setMethodCallHandler(callbacksHandler);
+    }
+
+    MethodCallHandler callbacksHandler = new MethodCallHandler() {
+        @Override
+        public void onMethodCall(MethodCall call, Result result) {
+            final String method = call.method;
+            if ("startListening".equals(method)) {
+                startListening(call.arguments, result);
+            } else {
+                result.notImplemented();
+            }
+        }
+    };
+
+    private Map<String, Map<String, Object>> mCallbacks = new HashMap<>();
+
+    private void startListening(Object arguments, Result rawResult) {
+        // Get callback id
+        String callbackName = (String) arguments;
+
+        Map<String, Object> args = new HashMap<>();
+        args.put("id", callbackName);
+        mCallbacks.put(callbackName, args);
+
+        rawResult.success(null);
     }
 
     @Override
@@ -75,8 +108,8 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
             case "initSdk":
                 initSdk(call, result);
                 break;
-            case "trackEvent":
-                trackEvent(call, result);
+            case "logEvent":
+                logEvent(call, result);
                 break;
             case "setHost":
                 setHost(call, result);
@@ -87,8 +120,8 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
             case "setIsUpdate":
                 setIsUpdate(call, result);
                 break;
-            case "stopTracking":
-                stopTracking(call, result);
+            case "stop":
+                stop(call, result);
                 break;
             case "updateServerUninstallToken":
                 updateServerUninstallToken(call, result);
@@ -132,14 +165,11 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
             case "setMinTimeBetweenSessions":
                 setMinTimeBetweenSessions(call, result);
                 break;
-            case "validateAndTrackInAppPurchase":
-                validateAndTrackInAppPurchase(call, result);
+            case "validateAndLogInAppPurchase":
+                validateAndLogInAppPurchase(call, result);
                 break;
             case "getAppsFlyerUID":
                 getAppsFlyerUID(result);
-                break;
-            case "generateInviteLink":
-                generateInviteLink(call, result);
                 break;
             case "getSDKVersion":
                 getSdkVersion(result);
@@ -150,36 +180,135 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
             case "setSharingFilterForAllPartners":
                 setSharingFilterForAllPartners(result);
                 break;
+            case "generateInviteLink":
+                generateInviteLink(call, result);
+                break;
+            case "setAppInviteOneLinkID":
+                setAppInivteOneLinkID(call, result);
+                break;
+            case "logCrossPromotionImpression":
+                logCrossPromotionImpression(call, result);
+                break;
+            case "logCrossPromotionAndOpenStore":
+                logCrossPromotionAndOpenStore(call, result);
+                break;
+            case "setOneLinkCustomDomain":
+                setOneLinkCustomDomain(call, result);
+                break;
             default:
                 result.notImplemented();
                 break;
         }
     }
-    
-    private void generateInviteLink(MethodCall call, final Result result) {
+
+    private void setOneLinkCustomDomain(MethodCall call, Result result) {
+        ArrayList<String> brandDomains = (ArrayList<String>) call.arguments;
+        String[] brandDomainsArray = brandDomains.toArray(new String[brandDomains.size()]);
+        AppsFlyerLib.getInstance().setOneLinkCustomDomain(brandDomainsArray);
+        result.success(null);
+    }
+
+    private void logCrossPromotionAndOpenStore(MethodCall call, Result result) {
+        String appId = (String)call.argument("appId");
+        String campaign = (String)call.argument("campaign");
+        Map data = (Map)call.argument("params");
+
+        if (appId != null && !appId.equals("")) {
+            CrossPromotionHelper.trackAndOpenStore(mContext, appId, campaign, data);
+        }
+        result.success(null);
+    }
+
+    private void logCrossPromotionImpression(MethodCall call, Result result) {
+        String appId = (String)call.argument("appId");
+        String campaign = (String)call.argument("campaign");
+        Map data = (Map)call.argument("data");
+
+        if (appId != null && !appId.equals("")) {
+            CrossPromotionHelper.trackCrossPromoteImpression(mContext, appId, campaign, data);
+        }
+        result.success(null);
+    }
+
+    private void setAppInivteOneLinkID(MethodCall call, Result result) {
+        String oneLinkId = (String) call.argument("oneLinkID");
+        if(oneLinkId==null || oneLinkId.length() == 0){
+            result.success(null);
+        }else{
+            AppsFlyerLib.getInstance().setAppInviteOneLink(oneLinkId);
+            if(mCallbacks.containsKey("successSetAppInviteOneLinkID")){
+                runOnUIThread("success", "successSetAppInviteOneLinkID");
+            }
+        }
+    }
+
+    private void generateInviteLink(MethodCall call, Result rawResult) {
+        String channel = (String) call.argument("channel");
+        String customerID = (String) call.argument("customerID");
+        String campaign = (String) call.argument("campaign");
+        String referrerName = (String) call.argument("referrerName");
+        String referrerImageUrl = (String) call.argument("referrerImageUrl");
+        String baseDeepLink = (String) call.argument("baseDeeplink");
+        String brandDomain = (String) call.argument("brandDomain");
+
         LinkGenerator linkGenerator = ShareInviteHelper.generateInviteUrl(mContext);
-        linkGenerator.setChannel((String) call.argument("channel"));
-        linkGenerator.generateLink(mContext, new CreateOneLinkHttpTask.ResponseListener() {
+
+        if (channel != null && !channel.equals("")) {
+            linkGenerator.setChannel(channel);
+        }
+        if (campaign != null && !campaign.equals("")) {
+            linkGenerator.setCampaign(campaign);
+        }
+        if (referrerName != null && !referrerName.equals("")) {
+            linkGenerator.setReferrerName(referrerName);
+        }
+        if (referrerImageUrl != null && !referrerImageUrl.equals("")) {
+            linkGenerator.setReferrerImageURL(referrerImageUrl);
+        }
+        if (customerID != null && !customerID.equals("")) {
+            linkGenerator.setReferrerCustomerId(customerID);
+        }
+        if (baseDeepLink != null && !baseDeepLink.equals("")) {
+            linkGenerator.setBaseDeeplink(baseDeepLink);
+        }
+        if (brandDomain != null && !brandDomain.equals("")) {
+            linkGenerator.setBrandDomain(brandDomain);
+        }
+
+        CreateOneLinkHttpTask.ResponseListener listener = new CreateOneLinkHttpTask.ResponseListener() {
             @Override
-            public void onResponse(final String url) {
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        result.success(url);
-                    }
-                });
+            public void onResponse(final String oneLinkUrl) {
+                if (mCallbacks.containsKey("successGenerateInviteLink")) {
+                    runOnUIThread(oneLinkUrl, "successGenerateInviteLink");
+                }
             }
 
             @Override
-            public void onResponseError(final String url) {
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
+            public void onResponseError(final String error) {
+                if (mCallbacks.containsKey("errorGenerateInviteLink")) {
+                    runOnUIThread(error, "errorGenerateInviteLink");
+                }
+            }
+        };
+
+        linkGenerator.generateLink(mContext, listener);
+
+        rawResult.success(null);
+    }
+
+    private void runOnUIThread(final String data, final String callbackName) {
+        uiThreadHandler.post(
+                new Runnable() {
                     @Override
                     public void run() {
-                        result.success(url);
+                        Log.d("Callbacks","Calling invokeMethod with: " + data);
+                        Map<String, Object> args = new HashMap<>();
+                        args.put("id", callbackName);
+                        args.put("data", data);
+                        mCallbackChannel.invokeMethod("callListener", args);
                     }
-                });
-            }
-        });
+                }
+        );
     }
 
     private void setSharingFilterForAllPartners(Result result) {
@@ -205,7 +334,7 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         }
     }
 
-    private void validateAndTrackInAppPurchase(MethodCall call, Result result) {
+    private void validateAndLogInAppPurchase(MethodCall call, Result result) {
         registerValidatorListener();
         String publicKey = (String) call.argument("publicKey");
         String signature = (String) call.argument("signature");
@@ -330,9 +459,9 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         result.success(null);
     }
 
-    private void stopTracking(MethodCall call, Result result) {
-        boolean isTrackingStopped = (boolean) call.argument("isTrackingStopped");
-        AppsFlyerLib.getInstance().stopTracking(isTrackingStopped, mContext);
+    private void stop(MethodCall call, Result result) {
+        boolean isStopped = (boolean) call.argument("isStopped");
+        AppsFlyerLib.getInstance().stopTracking(isStopped, mContext);
         result.success(null);
     }
 
@@ -364,8 +493,8 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         }
 
         String afDevKey = (String) call.argument(AppsFlyerConstants.AF_DEV_KEY);
-        if(afDevKey == null || afDevKey.equals("")){
-            result.error(null,"AF Dev Key is empty","AF dev key cannot be empty");
+        if (afDevKey == null || afDevKey.equals("")) {
+            result.error(null, "AF Dev Key is empty", "AF dev key cannot be empty");
         }
 
         boolean getGCD = (boolean) call.argument(AppsFlyerConstants.AF_GCD);
@@ -387,13 +516,19 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         }
 
         instance.init(afDevKey, gcdListener, mContext);
+
+        String appInviteOneLink = (String) call.argument(AppsFlyerConstants.AF_APP_INVITE_ONE_LINK);
+        if(appInviteOneLink != null){
+            instance.setAppInviteOneLink(appInviteOneLink);
+        }
+
         instance.trackEvent(mContext, null, null);
         instance.startTracking(mApplication, afDevKey);
 
         result.success("success");
     }
 
-    private void trackEvent(MethodCall call, MethodChannel.Result result) {
+    private void logEvent(MethodCall call, MethodChannel.Result result) {
 
         AppsFlyerLib instance = AppsFlyerLib.getInstance();
 
@@ -420,8 +555,8 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
 
             @Override
             public void onAppOpenAttribution(Map<String, String> map) {
-                Map<String, Object> objMap = (Map)map;
-                handleSuccess(AF_ON_APP_OPEN_ATTRIBUTION,objMap, AF_EVENTS_CHANNEL);
+                Map<String, Object> objMap = (Map) map;
+                handleSuccess(AF_ON_APP_OPEN_ATTRIBUTION, objMap, AF_EVENTS_CHANNEL);
             }
 
             @Override
@@ -444,15 +579,14 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         }
     }
 
-    private Map<String,Object> replaceNullValues(Map<String,Object> map)
-    {
+    private Map<String, Object> replaceNullValues(Map<String, Object> map) {
         // cant use stream because of older versions of java
-        Map<String,Object> newMap = new HashMap<
+        Map<String, Object> newMap = new HashMap<
                 >();
         Iterator it = map.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String,Object> pair = (Map.Entry)it.next();
-            newMap.put(pair.getKey(), pair.getValue() == null ?  JSONObject.NULL : pair.getValue());
+            Map.Entry<String, Object> pair = (Map.Entry) it.next();
+            newMap.put(pair.getKey(), pair.getValue() == null ? JSONObject.NULL : pair.getValue());
             it.remove(); // avoids a ConcurrentModificationException
         }
 
@@ -478,9 +612,10 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         intent.setAction(AppsFlyerConstants.AF_BROADCAST_ACTION_NAME);
-        intent.putExtra("params",params.toString());
-        if (mContext != null) {
-            mContext.sendBroadcast(intent);
+        intent.putExtra("params", params.toString());
+
+        if(mContext != null){
+           mContext.sendBroadcast(intent);
         } else {
             Log.w("AppsflyerSdk", "No context to send event to dart with");
         }
@@ -490,7 +625,7 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
 
     @Override
     public void onAttachedToEngine(FlutterPluginBinding binding) {
-        onAttachedToEngine(binding.getApplicationContext(),binding.getBinaryMessenger());
+        onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
     }
 
     @Override
@@ -505,8 +640,8 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
 
     @Override
     public void onAttachedToActivity(ActivityPluginBinding binding) {
-       mIntent = binding.getActivity().getIntent();
-       mApplication = binding.getActivity().getApplication();
+        mIntent = binding.getActivity().getIntent();
+        mApplication = binding.getActivity().getApplication();
     }
 
     @Override
@@ -520,5 +655,50 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
 
     @Override
     public void onDetachedFromActivity() {
+
+    }
+
+    private static class MethodResultWrapper implements MethodChannel.Result {
+        private MethodChannel.Result methodResult;
+        private Handler handler;
+
+        MethodResultWrapper(MethodChannel.Result result) {
+            methodResult = result;
+            handler = new Handler(Looper.getMainLooper());
+        }
+
+        @Override
+        public void success(final Object result) {
+            handler.post(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            methodResult.success(result);
+                        }
+                    });
+        }
+
+        @Override
+        public void error(
+                final String errorCode, final String errorMessage, final Object errorDetails) {
+            handler.post(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            methodResult.error(errorCode, errorMessage, errorDetails);
+                        }
+                    });
+        }
+
+        @Override
+        public void notImplemented() {
+            handler.post(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            methodResult.notImplemented();
+                        }
+                    });
+        }
     }
 }

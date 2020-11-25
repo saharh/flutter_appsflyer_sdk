@@ -39,12 +39,30 @@ class AppsflyerSdk {
 
   Map<String, dynamic> _validateAFOptions(AppsFlyerOptions options) {
     Map<String, dynamic> validatedOptions = {};
+
     //validations
     dynamic devKey = options.afDevKey;
     assert(devKey != null);
     assert(devKey is String);
 
     validatedOptions[AppsflyerConstants.AF_DEV_KEY] = devKey;
+
+    dynamic appInviteOneLink = options.appInviteOneLink;
+    if (appInviteOneLink != null) {
+      assert(appInviteOneLink is String);
+    }
+
+    validatedOptions[AppsflyerConstants.APP_INVITE_ONE_LINK] = appInviteOneLink;
+
+    if (options.disableCollectASA != null) {
+      validatedOptions[AppsflyerConstants.DISABLE_COLLECT_ASA] =
+          options.disableCollectASA;
+    }
+
+    if (options.disableAdvertisingIdentifier != null) {
+      validatedOptions[AppsflyerConstants.DISABLE_ADVERTISING_IDENTIFIER] =
+          options.disableAdvertisingIdentifier;
+    }
 
     if (Platform.isIOS) {
       dynamic appID = options.appId;
@@ -78,7 +96,36 @@ class AppsflyerSdk {
 
     afOptions[AppsflyerConstants.AF_DEV_KEY] = devKey;
 
+    dynamic appInviteOneLink = options[AppsflyerConstants.APP_INVITE_ONE_LINK];
+    if (appInviteOneLink != null) {
+      assert(appInviteOneLink is String);
+    }
+
+    afOptions[AppsflyerConstants.APP_INVITE_ONE_LINK] = appInviteOneLink;
+
+    if (options[AppsflyerConstants.DISABLE_COLLECT_ASA] != null) {
+      afOptions[AppsflyerConstants.DISABLE_COLLECT_ASA] =
+          options[AppsflyerConstants.DISABLE_COLLECT_ASA];
+    }
+
+    if (options[AppsflyerConstants.DISABLE_ADVERTISING_IDENTIFIER] != null) {
+      afOptions[AppsflyerConstants.DISABLE_ADVERTISING_IDENTIFIER] =
+          options[AppsflyerConstants.DISABLE_ADVERTISING_IDENTIFIER];
+    }
+
     if (Platform.isIOS) {
+      if (options[
+              AppsflyerConstants.AF_TIME_TO_WAIT_FOR_ATT_USER_AUTHORIZATION] !=
+          null) {
+        dynamic timeToWaitForATTUserAuthorization = options[
+            AppsflyerConstants.AF_TIME_TO_WAIT_FOR_ATT_USER_AUTHORIZATION];
+        assert(timeToWaitForATTUserAuthorization is double);
+
+        afOptions[
+                AppsflyerConstants.AF_TIME_TO_WAIT_FOR_ATT_USER_AUTHORIZATION] =
+            timeToWaitForATTUserAuthorization;
+      }
+
       dynamic appID = options[AppsflyerConstants.AF_APP_Id];
       assert(appID != null, "appleAppId is required for iOS apps");
       assert(appID is String);
@@ -112,7 +159,7 @@ class AppsflyerSdk {
   }
 
   Stream<Map> get conversionDataStream {
-    return _afGCDStreamController?.stream;
+    return _afGCDStreamController?.stream?.asBroadcastStream();
   }
 
   // Accessing AppsFlyer attribution, referred from deep linking
@@ -125,7 +172,7 @@ class AppsflyerSdk {
   }
 
   Stream<Map> get appOpenAttributionStream {
-    return _afOpenAttributionStreamController?.stream;
+    return _afOpenAttributionStreamController?.stream?.asBroadcastStream();
   }
 
   ///Returns `Stream`. Accessing AppsFlyer purchase validation data
@@ -169,15 +216,15 @@ class AppsflyerSdk {
     return _methodChannel.invokeMethod("getSDKVersion");
   }
 
-  ///These in-app events help you track how loyal users discover your app, and attribute them to specific
+  ///These in-app events help you to log how loyal users discover your app, and attribute them to specific
   ///campaigns/media-sources. Please take the time define the event/s you want to measure to allow you
-  ///to track ROI (Return on Investment) and LTV (Lifetime Value).
-  ///- The `trackEvent` method allows you to send in-app events to AppsFlyer analytics. This method allows you to add events dynamically by adding them directly to the application code.
-  Future<bool> trackEvent(String eventName, Map eventValues) async {
+  ///to send ROI (Return on Investment) and LTV (Lifetime Value).
+  ///- The `logEvent` method allows you to send in-app events to AppsFlyer analytics. This method allows you to add events dynamically by adding them directly to the application code.
+  Future<bool> logEvent(String eventName, Map eventValues) async {
     assert(eventValues != null);
 
     return await _methodChannel.invokeMethod(
-        "trackEvent", {'eventName': eventName, 'eventValues': eventValues});
+        "logEvent", {'eventName': eventName, 'eventValues': eventValues});
   }
 
   void setHost(String hostPrefix, String hostName) {
@@ -243,9 +290,8 @@ class AppsflyerSdk {
   /// Once this API is invoked, our SDK no longer communicates with our servers and stops functioning.
   /// In some extreme cases you might want to shut down all SDK activity due to legal and privacy compliance.
   /// This can be achieved with the stopTracking API.
-  void stopTracking(bool isTrackingStopped) {
-    _methodChannel
-        .invokeMethod("stopTracking", {'isTrackingStopped': isTrackingStopped});
+  void stop(bool isStopped) {
+    _methodChannel.invokeMethod("stop", {'isStopped': isStopped});
   }
 
   void enableLocationCollection(bool flag) {
@@ -290,14 +336,14 @@ class AppsflyerSdk {
   }
 
   ///Returns `Stream`. Accessing AppsFlyer purchase validation data
-  Stream<dynamic> validateAndTrackInAppPurchase(
+  Stream<dynamic> validateAndLogInAppPurchase(
       String publicKey,
       String signature,
       String purchaseData,
       String price,
       String currency,
       Map<String, String> additionalParameters) {
-    _methodChannel.invokeMethod("validateAndTrackInAppPurchase", {
+    _methodChannel.invokeMethod("validateAndLogInAppPurchase", {
       'publicKey': publicKey,
       'signature': signature,
       'purchaseData': purchaseData,
@@ -366,5 +412,64 @@ class AppsflyerSdk {
 
   void setSharingFilterForAllPartners() {
     _methodChannel.invokeMethod("setSharingFilterForAllPartners");
+  }
+
+  void generateInviteLink(
+    AppsFlyerInviteLinkParams parameters,
+    Function success,
+    Function error,
+  ) {
+    Map<String, String> paramsMap;
+    if (parameters != null) {
+      paramsMap = _translateInviteLinkParamsToMap(parameters);
+    }
+    startListening(success, "successGenerateInviteLink");
+    startListening(error, "errorGenerateInviteLink");
+    _methodChannel.invokeMethod("generateInviteLink", paramsMap);
+  }
+
+  Map<String, String> _translateInviteLinkParamsToMap(
+      AppsFlyerInviteLinkParams params) {
+    Map<String, String> inviteLinkParamsMap = Map<String, String>();
+    inviteLinkParamsMap['referrerImageUrl'] = params.referreImageUrl;
+    inviteLinkParamsMap['customerID'] = params.customerID;
+    inviteLinkParamsMap['brandDomain'] = params.brandDomain;
+    inviteLinkParamsMap['baseDeeplink'] = params.baseDeepLink;
+    inviteLinkParamsMap['referrerName'] = params.referrerName;
+    inviteLinkParamsMap['channel'] = params.channel;
+    inviteLinkParamsMap['campaign'] = params.campaign;
+
+    return inviteLinkParamsMap;
+  }
+
+  ///Set the OneLink ID that should be used for User-Invite-API.
+  ///The link that is generated for the user invite will use this OneLink ID as the base link ID
+  Future<void> setAppInviteOneLinkID(
+      String oneLinkID, Function callback) async {
+    startListening(callback, "successSetAppInviteOneLinkID");
+    await _methodChannel.invokeMethod("setAppInviteOneLinkID", {
+      'oneLinkID': oneLinkID,
+    });
+  }
+
+  ///To attribute an impression use the following API call.
+  ///Make sure to use the promoted App ID as it appears within the AppsFlyer dashboard.
+  void logCrossPromotionImpression(String appId, String campaign, Map data) {
+    _methodChannel.invokeMethod("logCrossPromotionImpression",
+        {'appId': appId, 'campaign': campaign, 'data': data});
+  }
+
+  ///Use the following API to attribute the click and launch the app store's app page.
+  void logCrossPromotionAndOpenStore(
+      String appId, String campaign, Map params) {
+    _methodChannel.invokeMethod("logCrossPromotionAndOpenStore", {
+      'appId': appId,
+      'campaign': campaign,
+      'params': params,
+    });
+  }
+
+  void setOneLinkCustomDomain(List<String> brandDomains) {
+    _methodChannel.invokeMethod("setOneLinkCustomDomain", brandDomains);
   }
 }

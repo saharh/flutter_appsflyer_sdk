@@ -1,17 +1,21 @@
 #import <Flutter/Flutter.h>
-#import <AppsFlyerLib/AppsFlyerTracker.h>
+#import <AppsFlyerLib/AppsFlyerLib.h>
 
 @interface AppsflyerSdkPlugin: NSObject<FlutterPlugin>
 
 @end
 
 // Appsflyer JS objects
-#define afDevKey                        @"afDevKey"
-#define afAppId                         @"afAppId"
-#define afIsDebug                       @"isDebug"
-#define afEventName                     @"eventName"
-#define afEventValues                   @"eventValues"
-#define afConversionData                @"GCD"
+#define afDevKey                            @"afDevKey"
+#define afAppId                             @"afAppId"
+#define afIsDebug                           @"isDebug"
+#define afTimeToWaitForATTUserAuthorization @"timeToWaitForATTUserAuthorization"
+#define afEventName                         @"eventName"
+#define afEventValues                       @"eventValues"
+#define afConversionData                    @"GCD"
+#define afDisableCollectASA                 @"disableCollectASA"
+#define afDisableAdvertisingIdentifier      @"disableAdvertisingIdentifier"
+
 #define afOneLinkId                     @"oneLinkId"
 
 // Appsflyer native objects
@@ -26,5 +30,6 @@
 
 // Stream Channels
 #define afMethodChannel                 @"af-api"
+#define afCallbacksMethodChannel        @"callbacks"
 #define afEventChannel                  @"af-events"
 #define afValidatePurchaseChannel       @"af-validate-purchase"

@@ -1,5 +1,40 @@
 # Versions
 
+## 6.0.5
+- Update SDK version to:
+    - Android: 5.4.5
+    - iOS: 6.0.5
+- Update Google install referrer to 2.1
+- Added support for: https://support.appsflyer.com/hc/en-us/articles/207032066#additional-apis-kids-apps
+- Fixed typo in `validateAndLogInAppPurchase`
+
+## 6.0.3+5 
+- Add null check for context in Android
+
+## 6.0.3+4 
+- Fixed bug with sending arguments with methodChannel 
+
+## 6.0.3+3
+- Added the functions: 
+`logCrossPromotionAndOpenStore` 
+`logCrossPromotionImpression` 
+`setAppInviteOneLinkID` 
+`generateInviteLink`
+
+## 6.0.3+2
+- Removed AppTrackingTransparency framework
+
+## 6.0.3+1
+- Updated AppsFlyer iOS SDK to v6.0.3
+
+## 6.0.2+1
+- Fixed the issue in the example app on Android platform
+- Updated AppsFlyer SDK to v5.4.3
+
+## 6.0.2
+- iOS sdk version is now 6.0.2 and support AppTrackingTransparency framework
+- Android sdk version is 5.4.1
+
 ## 5.4.1+1
 - Added documentation
 - Added secured links to README

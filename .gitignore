@@ -46,10 +46,8 @@ unlinked.ds
 unlinked_spec.ds
 
 # Android related
-**/android/**/gradle-wrapper.jar
 **/android/.gradle
 **/android/captures/
-**/android/gradlew
 **/android/gradlew.bat
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
@@ -89,8 +87,6 @@ unlinked_spec.ds
 
 android/\.settings/
 
-android/gradle/
-
 android/\.project
 
 android/\.classpath
@@ -100,3 +96,9 @@ example/ios/Flutter/flutter_export_environment.sh
 example/ios/Runner.xcodeproj/project.pbxproj
 
 example/.flutter-plugins-dependencies
+
+node_modules/
+
+covBadgeGen.js
+coverage/
+.env
