@@ -26,6 +26,7 @@ class AppsflyerConstants {
   static const String APP_INVITE_ONE_LINK = "appInviteOneLink";
 
   static const String DISABLE_COLLECT_ASA = "disableCollectASA";
+  static const String DISABLE_ADVERTISING_IDENTIFIER =
       "disableAdvertisingIdentifier";
       
   static const String AF_ADDITIONAL_ONELINK_ID = "oneLinkId";
