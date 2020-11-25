@@ -500,6 +500,7 @@ public class AppsflyerSdkPlugin implements MethodCallHandler, FlutterPlugin, Act
         mMethodChannel = null;
         mEventChannel.setStreamHandler(null);
         mEventChannel = null;
+        AppsFlyerLib.getInstance().unregisterConversionListener();
     }
 
     @Override
