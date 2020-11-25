@@ -304,11 +304,6 @@ class AppsflyerSdk {
     print("Please use updateServerUninstallToken instead");
   }
 
-  Future<String> generateInviteLink(String channel) async {
-    return await _methodChannel
-        .invokeMethod("generateInviteLink", {"channel": channel});
-  }
-  
   ///Manually pass the Firebase / GCM Device Token for Uninstall measurement.
   void updateServerUninstallToken(String token) {
     _methodChannel.invokeMethod("updateServerUninstallToken", {'token': token});
