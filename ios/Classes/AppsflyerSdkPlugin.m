@@ -329,7 +329,7 @@
         [[AppsFlyerLib shared] setDelegate:_streamHandler];
     }
     
-    appInviteOneLink = call.arguments[afInviteOneLink];
+    appInviteOneLink = call.arguments[afOneLinkId];
     if(appInviteOneLink != nil){
         [AppsFlyerLib shared].appInviteOneLinkID = appInviteOneLink;
     }
@@ -351,7 +351,7 @@
     [AppsFlyerLib shared].appsFlyerDevKey = devKey;
     [AppsFlyerLib shared].isDebug = isDebug;
     NSString *appInviteOneLinkID = call.arguments[afOneLinkId];
-    [AppsFlyerTracker sharedTracker].appInviteOneLinkID = appInviteOneLinkID;
+    [AppsFlyerLib shared].appInviteOneLinkID = appInviteOneLinkID;
     [[AppsFlyerLib shared] start];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
