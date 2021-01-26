@@ -1,4 +1,12 @@
 # Versions
+## 6.0.5+3
+- Fixed `FormatException` caused by iOS side
+
+## 6.0.5+2
+- Switch to callbacks for `onAppOpenAttribution` and `onConversionData`
+
+## 6.0.5+1
+- Fixed `updateServerUninstallToken` on iOS
 
 ## 6.0.5
 - Update SDK version to:
